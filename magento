@@ -1,0 +1,123 @@
+INSTALLING MAGENTO ON UBUNTU 20.04
+
+	•	Step 1: Install Apache2
+	•	Step 2: Install MySQL and Create Database for Magento2
+	•	Step 3: Install PHP and required extensions
+	•	Step 4: Install and configure Elasticsearch
+	•	Install Elasticsearch
+	•	Configure Elasticsearch
+	•	Testing Elasticsearch
+	•	Step 5: Install Composer
+	•	Step 6: Download and Install Magento2
+	•	Download Magento2:-
+	•	Install Magento 2
+	•	Change DocumentRoot To Pub
+
+Step 1: Install Apache2
+
+sudo apt update
+sudo apt install apache2 //Installing apache2
+sudo apache2ctl -v
+systemctl is-enabled apache2 //enable auto start for apache
+
+Step 2: Install MySQL and Create Database for Magento2
+
+sudo apt install mysql-server
+
+sudo mysql_secure_installation //To secure your MySQL
+Create database and user:
+
+	sudo mysql
+	CREATE DATABASE magento2;
+	CREATE USER 'magento2'@'localhost' IDENTIFIED BY ‘password’;
+	GRANT ALL PRIVILEGES ON *.* TO 'magento2'@'localhost';
+	Exit
+
+
+
+Step 3: Install PHP and required extensions
+
+sudo apt update
+
+sudo apt install php7.4 libapache2-mod-php php-mysql
+
+sudo a2enmod rewrite //enable apache read, write mode
+
+sudo apt install php7.4-mbstring
+sudo phpenmod mbstring
+
+sudo apt install php7.4-bcmath php7.4-intl php7.4-soap php7.4-zip php7.4-gd php7.4-json php7.4-curl php7.4-cli php7.4-xml php7.4-xmlrpc php7.4-gmp php7.4-common
+
+sudo systemctl reload apache2 //reload apache
+Sudo vi /etc/php/7.3/cli/php.ini //open php.ini file and do some changes:
+max_execution_time=18000
+max_input_time=1800
+memory_limit=4G
+sudo systemctl reload apache2
+
+Step 4: Install and configure Elasticsearch
+sudo apt install openjdk-17-jdk //Install Openjdk17 (Java) 
+java -version
+The first step is to import the GPG key for Elasticsearch packages using the following command:
+sudo apt install curl
+sudo curl -sSfL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --no-default-keyring --keyring=gnupg-ring:/etc/apt/trusted.gpg.d/magento.gpg --import
+sudo sh -c 'echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" > /etc/apt/sources.list.d/elastic-7.x.list'
+sudo chmod 666 /etc/apt/trusted.gpg.d/magento.gpg
+sudo apt update
+sudo apt install elasticsearch
+sudo systemctl daemon-reload //Start and enable the Elasticsearch service
+sudo systemctl enable elasticsearch.service
+sudo systemctl start elasticsearch.service
+
+Configure Elasticsearch:
+Open elasticsearch.yml file and jvm.options file
+
+sudo vi /etc/elasticsearch/elasticsearch.yml
+	node.name: "My First Node"
+cluster.name: my-application
+network.host: 127.0.0.1
+http.port: 9200
+sudo vi /etc/elasticsearch/jvm.options //uncomment -Xms256m
+sudo systemctl daemon-reload
+sudo systemctl start elasticsearch.service
+curl -X GET 'http://localhost:9200' //test Elastricsearch is working or not
+
+Step 5: Install Composer
+
+curl -sS https://getcomposer.org/installer -o composer-setup.php
+sudo php composer-setup.php --install-dir=/usr/bin --filename=composer
+
+Step 6: Download and Install Magento2
+
+cd /var/www/html //goto html file
+
+sudo composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition magento2     //Download magento using composer
+
+
+Magento Installing command
+
+php bin/magento setup:install --base-url=<your-domain> --db-host=localhost --db-name=magento2 --db-user=magento2 --db-password=<your-db-password-of-magento2-user> --admin-firstname=Admin --admin-lastname=Admin --admin-email=admin@admin.com --admin-user=admin --admin-password=<your-admin-password> --language=en_US --currency=USD --timezone=America/Chicago --backend-frontname=admin --use-rewrites=1 --search-engine=elasticsearch7 --elasticsearch-host=localhost --elasticsearch-port=9200
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
